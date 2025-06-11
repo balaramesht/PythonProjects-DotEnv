@@ -83,6 +83,47 @@ The pipeline includes a task to set environment variables on the Azure Function 
 - Use Azure Application Settings for production secrets.
 - Separate local and cloud config cleanly.
 
+## 🧭 Azure Deployment Setup Summary
+
+This project is configured to be deployed to Azure using Azure DevOps pipelines. Here's a high-level summary of how everything works:
+
+### 1. 🧪 CI/CD Pipeline (`build.yaml`)
+- **Trigger**: Pipeline triggers on commits to `main`.
+- **Python Setup**: Selects Python 3.10 using `UsePythonVersion`.
+- **Install Dependencies**: Installs requirements from `requirements.txt`.
+- **Archive**: Zips the app for deployment.
+- **Publish Artifacts**: Stores the zipped function app as a build artifact.
+- **Deploy to Azure**: Deploys the artifact to your Azure Function App using `AzureFunctionApp@1`.
+- **Set App Settings** *(Optional)*: Uses `AzureAppServiceSettings@1` to push your `.env` variables as secure Azure Application Settings.
+
+### 2. 🛠 Azure Portal Setup (Manual Steps)
+Before running the pipeline:
+- Create a **Function App** in Azure (Linux, Python 3.10).
+- Link it to a **Resource Group** and **App Service Plan**.
+- Add any required **Application Settings** in the Configuration tab (like `DB_NAME`, `SECRET_KEY`).
+
+### 3. 📦 Azure DevOps Setup
+- Create a **service connection** named `MyAzureServiceConnection`.
+- Link your repo to an Azure Pipeline.
+- Place `build.yaml` in the root or configure it manually in pipeline settings.
+
+### 4. 🌐 Application Settings in Azure
+These are used in place of `.env` during deployment:
+- Can be added manually in Azure Portal > Configuration
+- Or automatically via pipeline
+
+### ✅ Summary
+
+| Environment | Secrets Source     | dotenv Used | Deployment               |
+|-------------|--------------------|-------------|---------------------------|
+| Local       | `.env` file        | ✅ Yes      | `func start` or VS Code   |
+| Azure Prod  | App Settings       | ❌ No       | Azure DevOps or Portal    |
+
+This ensures your development and production environments remain secure and properly isolated.
+
 ---
 
 Feel free to fork, modify, and integrate this setup in your own Azure Function apps!
+
+
+---
